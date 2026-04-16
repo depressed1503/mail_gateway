@@ -2,12 +2,6 @@ from datetime import datetime
 from pydantic import BaseModel, EmailStr
 
 
-class SendMessageIn(BaseModel):
-    to_email: EmailStr
-    subject: str
-    body: str
-
-
 class SendMessageOut(BaseModel):
     id: str
     status: str
@@ -15,8 +9,13 @@ class SendMessageOut(BaseModel):
 
 class MessageStatusOut(BaseModel):
     id: str
-    to_email: EmailStr
+    to_email: list[EmailStr]
+    from_email: EmailStr
+    cc: list[EmailStr]
+    bcc: list[EmailStr]
     subject: str
+    body: str
+    attachments: list[dict]
     status: str
     error: str | None
     created_at: datetime

@@ -5,4 +5,5 @@ psycopg[binary]==3.2.6
 pydantic[email]==2.11.3
 celery[redis]==5.5.2
 redis==5.2.1
+python-multipart==0.0.20
 loguru
