@@ -1,9 +1,17 @@
 import os
+from urllib.parse import quote_plus
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql+psycopg://postgres:postgres@db:5432/mailgw",
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "5432")
+DB_NAME = os.getenv("DB_NAME", "mailgw")
+DB_USER = os.getenv("DB_USER", "postgres")
+DB_PASSWORD = quote_plus(os.getenv("DB_PASSWORD", "postgres"))
+
+DATABASE_URL = (
+    f"postgresql+psycopg://{DB_USER}:{DB_PASSWORD}"
+    f"@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 )
+
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
 
