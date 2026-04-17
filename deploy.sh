@@ -9,7 +9,8 @@ VENV_DIR="$BACKEND_DIR/venv"
 
 API_SCREEN_NAME="${APP_NAME}_api"
 WORKER_SCREEN_NAME="${APP_NAME}_worker"
-
+NGINX_CONF_SOURCE="$PROJECT_DIR/nginx.conf"
+NGINX_CONF_TARGET_DIR="/etc/nginx/includes/"
 API_PORT=8067
 
 kill_screen() {
@@ -32,19 +33,22 @@ if [ ! -d "$VENV_DIR" ]; then
     exit 1
 fi
 
-# shellcheck disable=SC1091
 source "$VENV_DIR/bin/activate" || { echo "Failed to activate venv"; exit 1; }
 
 echo "Installing dependencies..."
 pip install -r requirements.txt
+echo "Nginx..."
 
-echo "Initializing database..."
-python - <<EOF
-from app.models import Base
-from app.db import engine
-Base.metadata.create_all(bind=engine)
-print("DB OK")
-EOF
+if [ ! -f "$NGINX_CONF_SOURCE" ]; then
+echo "Error: $NGINX_CONF_SOURCE nginx config file not found."
+exit 1
+fi
+
+sudo cp "$NGINX_CONF_SOURCE" "$NGINX_CONF_TARGET_DIR" || { echo "Nginx config copy error."; exit 1; }
+
+echo "Restarting Nginx..."
+sudo nginx -t || { echo "Nginx config error."; exit 1; }
+sudo nginx -s reload || { echo "Nginx reload error."; exit 1; }
 
 echo "Starting API in screen: $API_SCREEN_NAME"
 screen -dmS "$API_SCREEN_NAME" bash -c "
